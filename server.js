@@ -17,10 +17,10 @@ app.use(require('webpack-hot-middleware')(compiler))
 
 app.use(express.static(__dirname))
 
-app.listen(3000, err => {
+app.listen(4000, err => {
   if (err) {
     return console.error(err)
   }
 
-  console.info('Listening at localhost:3000')
+  console.info('Listening at localhost:4000')
 })

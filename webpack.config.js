@@ -6,7 +6,7 @@ const path = require('path')
 module.exports = {
   devtool: 'source-map',
 
-  entry: './src/index.js',
+  entry: ['webpack-hot-middleware/client?reload=true', './src/index.js'],
 
   output: {
     path: path.resolve('build'),
@@ -23,6 +23,9 @@ module.exports = {
       loader: 'babel',
       exclude: /node_modules/
     }, {
+      test: /\.html$/,
+      loader: 'html'
+    }, {
       test: /\.css$/,
       loader: ['style-loader', 'css-loader'],
       exclude: /node_modules/
@@ -34,7 +37,10 @@ module.exports = {
 
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new HtmlWebpackPlugin({title: 'playing-with-audio'}),
+    new HtmlWebpackPlugin({
+      title: 'playing-with-audio',
+      template: './src/index.html'
+    }),
     new webpack.NoErrorsPlugin()
   ]
 }
