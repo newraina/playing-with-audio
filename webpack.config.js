@@ -9,8 +9,7 @@ module.exports = {
   entry: ['webpack-hot-middleware/client?reload=true', './src/index.js'],
 
   output: {
-    path: path.resolve('build'),
-    publicPath: '/build/',
+    path: path.resolve('./'),
     filename: '[name].js'
   },
 
