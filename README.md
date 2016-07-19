@@ -2,4 +2,4 @@
 
 1. npm start
 
-2. 访问 [localhost:4000/build](localhost:4000/build)
+2. 访问 [localhost:4000](localhost:4000)
