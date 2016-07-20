@@ -1,5 +1,5 @@
 
-const random = Math.random
+const random = () => Math.random() * 2 - 1
 
 export const white = size => {
   const data = new Float32Array(size)
