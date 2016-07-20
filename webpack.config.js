@@ -19,15 +19,13 @@ module.exports = {
 
   module: {
     loaders: [{
-      loader: 'babel',
-      exclude: /node_modules/
+      loader: 'babel'
     }, {
       test: /\.html$/,
       loader: 'html'
     }, {
       test: /\.css$/,
-      loader: ['style-loader', 'css-loader'],
-      exclude: /node_modules/
+      loader: ['style-loader', 'css-loader']
     }, {
       test: /\.json$/,
       loader: 'json-loader'

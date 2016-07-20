@@ -1,22 +1,30 @@
 
+import * as noiser from './util/noise'
+
+const AudioContext = window.AudioContext || window.webkitAudioContext
+const getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia).bind(navigator)
+
 class Audio {
 
   constructor(opts = {}) {
     const defaultOpts = {
-      fftSize: 2048 // 32 ~ 32768
+      fftSize: 256 // 32 ~ 32768
     }
 
     this.options = {...defaultOpts, ...opts}
 
-    this.AudioContext = window.AudioContext || window.webkitAudioContext
-
-    this.context = new this.AudioContext()
+    this.context = new AudioContext()
 
     this.source = this.context.createBufferSource()
     this.gainNode = this.context.createGain()
     this.analyser = this.context.createAnalyser()
 
-    this.analyser.fftSize = this.options.fftSize
+    // 暂时在 render 中根据类型调整 fftSize
+    // todo 同一个audio 实例中，ffisize 不共享，使支持一个实例多个 render
+    // this.analyser.fftSize = this.options.fftSize
+    this.analyser.minDecibels = -90
+    this.analyser.maxDecibels = -10
+    this.analyser.smoothingTimeConstant = 0.85
 
     this.source.connect(this.analyser)
     this.analyser.connect(this.gainNode)
@@ -35,6 +43,34 @@ class Audio {
         this.buffer = data
         return data
       })
+  }
+
+  voice() {
+    return new Promise(function(resolve, reject) {
+      getUserMedia({audio: true}, resolve, reject)
+    })
+    .then(steam => {
+      // 流式音频，需要修改 source
+      this.source = this.context.createMediaStreamSource(steam)
+      this.source.connect(this.analyser)
+    })
+  }
+
+  noise(type = 'brown') {
+    // type: [white, pink, brown, perlin]
+    const sampleRate = this.context.sampleRate
+    const buffSize = 2 * sampleRate
+    const noiseBuff = this.context.createBuffer(1, buffSize, sampleRate)
+    const noiseData = noiseBuff.getChannelData(0) //  Float32Array
+    const data = noiser[type](buffSize)
+
+    noiseData.forEach((v, i) => {
+      noiseData[i] = data[i]
+    })
+
+    this.buffer = noiseBuff
+
+    return Promise.resolve(noiseBuff)
   }
 
   play(opts = {}) {
@@ -57,7 +93,7 @@ class Audio {
 
     this.source.buffer = this.buffer
     this.source.loop = loop
-    this.gainNode.gain.value = 0
+    this.gainNode.gain.value = volume
 
     this.source.start(when, offset)
 
@@ -101,10 +137,12 @@ class Audio {
     document.body.appendChild(canvas)
 
     if (mode === 'freq') {
+      this.analyser.fftSize = 256
       drawFrequencyData(ctx, width, height, this.analyser)
     }
 
     if (mode === 'time') {
+      this.analyser.fftSize = 2048
       drawTimeDomainData(ctx, width, height, this.analyser)
     }
   }
@@ -119,9 +157,9 @@ export default Audio
 function drawFrequencyData(ctx, width, height, analyser) {
   const frequencyBinCount = analyser.frequencyBinCount
   const data = new Uint8Array(frequencyBinCount)
-  const barWidth = 5
-  const barGap = 4
-  const barCount = (width / (barWidth + barGap)) | 0
+  const barWidth = width / frequencyBinCount * 2.5
+  const barGap = 1
+  const barCount = (width / (barWidth + barGap))
   const step = (frequencyBinCount / barCount) | 0
 
   function loop() {
@@ -130,12 +168,15 @@ function drawFrequencyData(ctx, width, height, analyser) {
     analyser.getByteFrequencyData(data)
 
     ctx.fillStyle = '#E1F6F4'
+    ctx.globalAlpha = 1
     ctx.fillRect(0, 0, width, height)
 
-    ctx.fillStyle = '#6AC1B8'
+    ctx.fillStyle = 'rgb(106,193,184)'
 
     for (let i = 0; i < barCount; i++) {
       const value = data[i * step] / 256 * height
+
+      ctx.globalAlpha = 0.5 + value / height * 0.5
       ctx.fillRect(i * (barWidth + barGap), height - value, barWidth, value)
     }
   }
