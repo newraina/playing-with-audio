@@ -95,20 +95,40 @@ class Audio {
     }
     const options = {...defaultOpts, ...opts}
 
-    const oscillator = this.context.createOscillator()
     this.toneLength = 1 / (options.bpm / 60) * NOTE_LENGTH[options.nodeLength]
 
-    oscillator.type = options.type // [sine, square, sawtooth, triangle, custom]
-    oscillator.frequency.value = options.frequency
-    oscillator.connect(this.analyser)
+    options.frequency = [].concat(options.frequency)
 
     this.isPlaying = true
-    this.gainNode.value = 1
-    oscillator.start(this.context.currentTime)
-    oscillator.stop(this.context.currentTime + this.toneLength)
+    this.gainNode.value = 0.5
+
+    let startTime, endTime
+
+    options.frequency.forEach((v, i) => {
+      startTime = endTime ? endTime + this.toneLength / 2 : this.context.currentTime + i * this.toneLength
+      endTime = startTime ? startTime + this.toneLength : this.context.currentTime + (i + 1) * this.toneLength
+
+      v.split(',').forEach((item, j) => {
+        if (NOTE_LENGTH[item]) {
+          const blank = 1 / (options.bpm / 60) * NOTE_LENGTH[item]
+          startTime += blank
+          endTime = startTime + blank
+          return
+        }
+
+        const oscillator = this.context.createOscillator()
+
+        oscillator.type = options.type // [sine, square, sawtooth, triangle, custom]
+        oscillator.frequency.value = NOTES[item.trim()] || item
+        oscillator.connect(this.analyser)
+        oscillator.start(startTime)
+        oscillator.stop((endTime))
+
+        this.oscillator = oscillator
+      })
+    })
 
     this.mode = 'tone'
-    this.oscillator = oscillator
   }
 
   play(opts = {}) {
@@ -174,11 +194,14 @@ class Audio {
     return dataArray
   }
 
-  render({mode = 'freq'}) {
-    const width = 450
-    const height = 150
-
-    const canvas = document.createElement('canvas')
+  render({
+    mode = 'freq',
+    expand = true,
+    target = null,
+    width = 450,
+    height = 150
+  }) {
+    const canvas = target ? target : document.createElement('canvas')
     const ctx = canvas.getContext('2d')
 
     canvas.width = width
@@ -187,12 +210,12 @@ class Audio {
 
     if (mode === 'freq') {
       this.analyser.fftSize = 256
-      drawFrequencyData(ctx, width, height, this.analyser)
+      drawFrequencyData(ctx, width, height, this.analyser, expand)
     }
 
     if (mode === 'time') {
       this.analyser.fftSize = 2048
-      drawTimeDomainData(ctx, width, height, this.analyser)
+      drawTimeDomainData(ctx, width, height, this.analyser, expand)
     }
   }
 }
@@ -203,10 +226,10 @@ export default Audio
 * private
 */
 
-function drawFrequencyData(ctx, width, height, analyser) {
+function drawFrequencyData(ctx, width, height, analyser, expand) {
   const frequencyBinCount = analyser.frequencyBinCount
   const data = new Uint8Array(frequencyBinCount)
-  const barWidth = width / frequencyBinCount * 2.5
+  const barWidth = width / frequencyBinCount * (expand ? 2.5 : 1)
   const barGap = 1
   const barCount = (width / (barWidth + barGap))
   const step = (frequencyBinCount / barCount) | 0
@@ -216,11 +239,10 @@ function drawFrequencyData(ctx, width, height, analyser) {
 
     analyser.getByteFrequencyData(data)
 
-    ctx.fillStyle = '#E1F6F4'
     ctx.globalAlpha = 1
-    ctx.fillRect(0, 0, width, height)
+    ctx.clearRect(0, 0, width, height)
 
-    ctx.fillStyle = 'rgb(106,193,184)'
+    ctx.fillStyle = 'rgb(10,10,10)'
 
     for (let i = 0; i < barCount; i++) {
       const value = data[i * step] / 256 * height
@@ -233,7 +255,7 @@ function drawFrequencyData(ctx, width, height, analyser) {
   loop()
 }
 
-function drawTimeDomainData(ctx, width, height, analyser) {
+function drawTimeDomainData(ctx, width, height, analyser, expand) {
   const fftSize = analyser.fftSize
   const data = new Uint8Array(fftSize)
 
@@ -242,11 +264,11 @@ function drawTimeDomainData(ctx, width, height, analyser) {
 
     analyser.getByteTimeDomainData(data)
 
-    ctx.fillStyle = '#E1F6F4'
-    ctx.fillRect(0, 0, width, height)
+    ctx.globalAlpha = 1
+    ctx.clearRect(0, 0, width, height)
 
     ctx.lineWidth = 1
-    ctx.strokeStyle = '#6AC1B8'
+    ctx.strokeStyle = 'rgb(10,10,10)'
 
     ctx.beginPath()
 

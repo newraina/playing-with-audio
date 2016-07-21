@@ -1,0 +1,264 @@
+<!--
+    Powered By nodePPT - This is probably the best web presentation tool so far!
+    version: 1.4.2
+    site: https://github.com/ksky521/nodePPT
+    date: 
+-->
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>playing-with-audio - By newraina</title>
+    <link rel="stylesheet" media="all" href="./css/nodeppt.css">
+    <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="./css/phone.css">
+    
+    <link rel="stylesheet" href="./js/highlight/styles/tomorrow.css">
+    <link rel="stylesheet" href="./css/font-awesome.css">
+    
+<link rel="stylesheet" href="./css/theme.light.css">
+</head>
+<body>
+<div class="slides">
+    <slides id="container">
+        <slide class="slide" data-on-leave="removeVoice"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1>Web Audio API</h1>
+<iframe scrolling="no" seamless="no" style="background:none;height:180px;" data-src="./src/page/1.html" src="about:blank;"></iframe>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>不少人喜欢做 HTML5 音乐播放器</h1>
+
+</hgroup><article>
+
+<p class="moveIn"><span>v2ex 分享创造板块 <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1><code>&lt;audio&gt;</code></h1>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<h2><code>audio.src</code></h2>
+<h2><code>audio.play()</code></h2>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1>想控制更多东西怎么办？</h1>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>需要一个容器</h1>
+
+</hgroup><article>
+
+<p class="moveIn"><span><code>context = new AudioContext()</code> <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>声音的源头怎么弄</h1>
+
+</hgroup><article>
+
+<p class="moveIn"><span>比如一首歌？ <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<pre><code class="javascript">fetch(musicURL)
+  .then(res =&gt; res.arrayBuffer())
+  .then(buffer =&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      context.decodeAudioData(buffer, resolve, reject)
+    })
+  }
+</code></pre>
+
+</hgroup><article>
+
+<p class="moveIn"><span><code>ArrayBuffer</code>  &gt;&gt;  <code>decodeAudioData</code>  &gt;&gt;  <code>AudioBuffer</code> <span></p>
+<p class="moveIn"><span>我们得到了声音的源头 <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>怎么把声音送给扬声器？</h1>
+
+</hgroup><article>
+
+<p class="moveIn"><span><code>AudioBuffer</code> &gt;&gt; <code>source</code> &gt;&gt; <code>destination</code> <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<p><code>AudioBuffer</code> &gt;&gt; <code>source</code> &gt;&gt; <code>destination</code></p>
+
+</hgroup><article>
+
+<pre><code class="javascript">source = context.createBufferSource()
+source.buffer = AudioBuffer
+source.connect(context.destination)
+</code></pre>
+<iframe scrolling="no" seamless="no" style="background:none;height:180px;" data-src="./src/page/2.html" src="about:blank;"></iframe>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>好麻烦</h1>
+<p>用 <code>&lt;audio&gt;</code> 一行就搞定了</p>
+
+</hgroup><article>
+
+<p class="moveIn"><span>有意义  <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>source &gt;&gt; destination</h1>
+
+</hgroup><article>
+
+<p class="moveIn"><span>中间可以插入各种节点来获取和修改流过的音频数据 <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>可视化</h1>
+
+</hgroup><article>
+
+<h2>source &gt;&gt; analyser &gt;&gt; destination</h2>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<pre><code class="javascript">analyser = context.createAnalyser()
+
+source.connect(analyser)
+analyser.connect(context.destination)
+</code></pre>
+
+</hgroup><article>
+
+<p class="moveIn"><span><code>analyser.getByteTimeDomainData</code> <span></p>
+<p class="moveIn"><span><code>analyser.getByteFrequencyData</code> <span></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<iframe scrolling="no" seamless="no" style="background:none;height:180px;" data-src="./src/page/3.html" src="about:blank;"></iframe>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>可以自己生成声音吗？</h1>
+
+</hgroup><article>
+
+<p>既然声音在进入扬声器之前都是数组</p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1>自己随便填个数组试试？</h1>
+<pre><code class="javascript">const data = new Float32Array(441000)
+  .map(() =&gt; Math.random())
+</code></pre>
+<p><code>context.createBuffer</code>
+<code>buffer.getChannelData</code></p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<iframe scrolling="no" seamless="no" style="background:none;height:180px;" data-src="./src/page/4.html" src="about:blank;"></iframe>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1>能出声音，肯定就能出音乐</h1>
+<p>音乐就是不同频率的声音</p>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1>不需要手动建数组了</h1>
+<pre><code class="javascript">oscillator = context.createOscillator()
+oscillator.connect(this.context.destination)
+
+oscillator.frequency.value = 200
+</code></pre>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<iframe scrolling="no" seamless="no" style="background:none;height:180px;" data-src="./src/page/5.html" src="about:blank;"></iframe>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><hgroup>
+<h1>不好听...</h1>
+
+</hgroup><article>
+
+<ul class="moveIn">
+<li>模拟自然界</li>
+<li>数字音乐</li>
+</ul>
+
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article>
+<iframe scrolling="no" seamless="no" style="background:none;height:180px;" data-src="./src/page/6.html" src="about:blank;"></iframe>
+</article></section></slide>
+<slide class="slide"><section class="slide-wrapper"><article class="flexbox vcenter">
+<h1>谢谢</h1>
+
+</article></section></slide>
+        
+
+        <!-- <slide class="slide logoslide dark nobackground">
+            <article class="flexbox vcenter">
+                <h2 style="color: white;">Powered By nodePPT v1.4.2</h2>
+            </article>
+        </slide> -->
+        <div class="slideTip" id="tip"></div>
+    </slides>
+</div>
+<canvas id="drawBoard" class="draw-board" width="900" height="700"></canvas>
+<div class="progress"><span id="progress"></span></div>
+<div id="_buttons">
+    <div class="_btn-box" id="_btn-box" style="display:none;">
+        <button class="fa fa-arrow-circle-left" id="_btn-prev"></button>
+        <button class="fa fa-arrow-circle-right" id="_btn-next"></button>
+        <button class="fa fa-paint-brush" id="_btn-brush"></button>
+        <button class="fa fa-compress" id="_btn-overview" data-toggle="fa fa-expand"></button>
+    </div>
+    <button class="fa fa-bars" id="_btn-bar"  data-toggle="fa fa-close"></button>
+</div>
+<script src="./js/mixjs/lib/mix.0.3.0.min.js"></script>
+<script>
+var base = location.protocol + '//' + location.host;
+
+var path = (location.pathname + '#').split('/').filter(function(v){
+    return !!v;
+});
+path.pop();
+path = path.join('/');
+MixJS.config({
+    baseURL: [ base, path, 'js'].join('/')+'/'
+});
+
+</script>
+<script src="./js/mixjs/lib/event/broadcast.js"></script>
+<script src="./js/nodeppt.js"></script>
+<script>
+Slide.init({
+    containerID: 'container',
+    drawBoardID: 'drawBoard',
+    slideClass: '.slide',
+    buildClass: '.build',
+    progressID: 'progress',
+    transition: 'move',
+    width: 1100,
+    dir: './',
+    
+    //打开下面的注释就开启postMessage方式
+    //访问网址127.0.0.1:8080/ppt/demo#client
+    control:{
+        type: 'postMessage',
+        args:{
+            isControl:  false
+        }
+    },
+    
+    tipID: 'tip'
+});
+MixJS.loadJS('highlight/highlight.pack.js',function(){
+    hljs.tabReplace = '  ';
+    hljs.initHighlightingOnLoad();
+});
+</script>
+<link rel="stylesheet" href="slide.css">
+<script src="slide.js"></script>
+
+<!--placeholder-->
+</body>
+</html>
