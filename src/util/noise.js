@@ -1,6 +1,8 @@
 
 const random = () => Math.random() * 2 - 1
 
+// todo 噪音输出需要都在一个固定的范围内，声音不能有的太大有的太小
+
 export const white = size => {
   const data = new Float32Array(size)
     .map(() => random())

@@ -4,6 +4,7 @@
 const config = require('./webpack.config')
 const express = require('express')
 const webpack = require('webpack')
+const path = require('path')
 
 const compiler = webpack(config)
 const app = express()
@@ -14,7 +15,7 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler))
 
-app.use(express.static(__dirname))
+app.use(express.static(path.join(__dirname, 'build')))
 
 app.listen(4000, err => {
   if (err) {

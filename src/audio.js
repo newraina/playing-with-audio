@@ -1,6 +1,11 @@
 
 import * as noiser from './util/noise'
 
+import {
+  NOTE_LENGTH,
+  NOTES
+} from './constant'
+
 const AudioContext = window.AudioContext || window.webkitAudioContext
 const getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia).bind(navigator)
 
@@ -11,6 +16,8 @@ class Audio {
       fftSize: 256 // 32 ~ 32768
     }
 
+    this.mode = 'normal' // [normal, voice, tone, noise]
+
     this.options = {...defaultOpts, ...opts}
 
     this.context = new AudioContext()
@@ -18,6 +25,7 @@ class Audio {
     this.source = this.context.createBufferSource()
     this.gainNode = this.context.createGain()
     this.analyser = this.context.createAnalyser()
+    this.oscillator = this.context.createOscillator()
 
     // 暂时在 render 中根据类型调整 fftSize
     // todo 同一个audio 实例中，ffisize 不共享，使支持一个实例多个 render
@@ -46,6 +54,8 @@ class Audio {
   }
 
   voice() {
+    this.mode = 'voice'
+
     return new Promise(function(resolve, reject) {
       getUserMedia({audio: true}, resolve, reject)
     })
@@ -58,6 +68,9 @@ class Audio {
 
   noise(type = 'brown') {
     // type: [white, pink, brown, perlin]
+
+    this.mode = 'noise'
+
     const sampleRate = this.context.sampleRate
     const buffSize = 2 * sampleRate
     const noiseBuff = this.context.createBuffer(1, buffSize, sampleRate)
@@ -73,7 +86,39 @@ class Audio {
     return Promise.resolve(noiseBuff)
   }
 
+  tone(opts = {}) {
+    const defaultOpts = {
+      nodeLength: 'quarter',
+      frequency: 2000,
+      type: 'sine',
+      bpm: 120
+    }
+    const options = {...defaultOpts, ...opts}
+
+    const oscillator = this.context.createOscillator()
+    this.toneLength = 1 / (options.bpm / 60) * NOTE_LENGTH[options.nodeLength]
+
+    oscillator.type = options.type // [sine, square, sawtooth, triangle, custom]
+    oscillator.frequency.value = options.frequency
+    oscillator.connect(this.analyser)
+
+    this.isPlaying = true
+    this.gainNode.value = 1
+    oscillator.start(this.context.currentTime)
+    oscillator.stop(this.context.currentTime + this.toneLength)
+
+    this.mode = 'tone'
+    this.oscillator = oscillator
+  }
+
   play(opts = {}) {
+    this.isPlaying = true
+    this.gainNode.value = 1
+
+    if (this.mode === 'tone') {
+      return this.oscillator.start(this.context.currentTime)
+    }
+
     const defaultOpts = {
       loop: false,
       duraton: 0,
@@ -96,13 +141,17 @@ class Audio {
     this.gainNode.gain.value = volume
 
     this.source.start(when, offset)
-
-    this.isPlaying = true
   }
 
   stop() {
-    this.source.stop(0)
     this.isPlaying = false
+    this.gainNode.value = 0
+
+    if (this.mode === 'tone') {
+      return this.oscillator.stop(this.context.currentTime + this.toneLength)
+    }
+
+    this.source.stop(0)
   }
 
   toggle() {

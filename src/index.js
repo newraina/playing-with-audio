@@ -6,7 +6,7 @@ const audio2 = new Audio()
 const audio3 = new Audio()
 
 const noise = new Audio()
-window.noise = noise
+const tone = new Audio()
 
 // audio1.load('../music/xiaoxingxing.mp3')
 //   .then(() => audio1.play())
@@ -19,6 +19,19 @@ window.noise = noise
 // audio3.voice()
 //   .then(() => audio3.render({mode: 'freq'}))
 
-noise.noise()
-  .then(() => noise.play())
-  .then(() => noise.render({mode: 'freq'}))
+// noise.noise()
+//   .then(() => noise.play())
+//   .then(() => noise.render({mode: 'freq'}))
+
+tone.render({mode: 'freq'})
+
+const toneToggleBtn = document.querySelector('#tone_toggle')
+const toneFreqInput = document.querySelector('#tone_freq')
+
+toneToggleBtn.addEventListener('click', () => tone.tone())
+toneFreqInput.addEventListener('change', e => {
+  if (tone.isPlaying) {
+    tone.stop()
+  }
+  tone.tone({frequency: e.target.value})
+})
