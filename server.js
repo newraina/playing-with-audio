@@ -1,7 +1,7 @@
 
 'use strict'
 
-const config = require('./webpack.config')
+const config = require('./webpack.hot')
 const express = require('express')
 const webpack = require('webpack')
 const path = require('path')
