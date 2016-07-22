@@ -174,7 +174,7 @@ analyser.connect(context.destination)
 # 自己随便填个数组试试？
 
 ```javascript
-const data = new Float32Array(441000)
+const data = new Float32Array(44100)
   .map(() => Math.random())
 ```
 
