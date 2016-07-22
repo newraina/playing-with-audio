@@ -23,25 +23,25 @@ v2ex 分享创造板块 {:&.moveIn}
 
 # Aplayer  @DIYGod
 
-![](../../image/aplayer.jpg)
+![](../image/aplayer.jpg)
 
 [slide]
 
 # Cplayer  @Corps
 
-![](../../image/cplayer.png)
+![](../image/cplayer.png)
 
 [slide]
 
 # SKplayer  @scott15975
 
-![](../../image/skplayer.gif)
+![](../image/skplayer.gif)
 
 [slide]
 
 # mePlayer  @me
 
-![](../../image/meplayer.png)
+![](../image/meplayer.png)
 
 [slide]
 
@@ -223,7 +223,7 @@ oscillator.frequency.value = 200
 
 [slide]
 
-![](../../image/xiangya.jpg)
+![](../image/xiangya.jpg)
 
 ## 60G
 
