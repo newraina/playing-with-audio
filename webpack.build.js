@@ -8,7 +8,8 @@ const entrys = {
   3: './src/page/3.js',
   4: './src/page/4.js',
   5: './src/page/5.js',
-  6: './src/page/6.js'
+  6: './src/page/6.js',
+  7: './src/page/7.js'
 }
 
 module.exports = {

@@ -17,5 +17,3 @@ audio.voice()
     width: 300,
     height: 90
   }))
-
-audio.gainNode.value = 0

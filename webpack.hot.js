@@ -10,7 +10,8 @@ const entrys = {
   3: [...common, './src/page/3.js'],
   4: [...common, './src/page/4.js'],
   5: [...common, './src/page/5.js'],
-  6: [...common, './src/page/6.js']
+  6: [...common, './src/page/6.js'],
+  7: [...common, './src/page/7.js']
 }
 
 module.exports = {

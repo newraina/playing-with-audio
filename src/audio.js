@@ -55,6 +55,8 @@ class Audio {
 
   voice() {
     this.mode = 'voice'
+    this.gainNode.value = 0
+    this.analyser.disconnect()
 
     return new Promise(function(resolve, reject) {
       getUserMedia({audio: true}, resolve, reject)

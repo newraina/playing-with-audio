@@ -3,7 +3,6 @@ speaker: newraina
 url: https://github.com/newraina/playing-with-audio
 highlightStyle: tomorrow
 transition: move
-files: slide.css, slide.js
 theme: light
 
 [slide data-on-leave="removeVoice"]
@@ -22,6 +21,30 @@ v2ex 分享创造板块 {:&.moveIn}
 
 [slide]
 
+# Aplayer  @DIYGod
+
+![](../../image/aplayer.jpg)
+
+[slide]
+
+# Cplayer  @Corps
+
+![](../../image/cplayer.png)
+
+[slide]
+
+# SKplayer  @scott15975
+
+![](../../image/skplayer.gif)
+
+[slide]
+
+# mePlayer  @me
+
+![](../../image/meplayer.png)
+
+[slide]
+
 # `<audio>`
 
 [slide]
@@ -32,6 +55,10 @@ v2ex 分享创造板块 {:&.moveIn}
 [slide]
 
 # 想控制更多东西怎么办？
+
+---
+
+audio api {:&.moveIn}
 
 [slide]
 
@@ -65,7 +92,7 @@ fetch(musicURL)
 
 `ArrayBuffer`  >>  `decodeAudioData`  >>  `AudioBuffer` {:&.moveIn}
 
-我们得到了声音的源头 {:&.moveIn}
+得到了声音的源头 {:&.moveIn}
 
 [slide]
 
@@ -190,8 +217,20 @@ oscillator.frequency.value = 200
 
 [slide]
 
+# 大自然没有突变
+
+所有的改变都需要时间
+
+[slide]
+
+![](../../image/xiangya.jpg)
+
+## 60G
+
+[slide]
+
 <iframe scrolling="no" seamless="no" style="background:none;height:180px;" data-src="/src/page/6.html" src="about:blank;"></iframe>
 
 [slide]
 
-# 谢谢
+# 谢谢!
