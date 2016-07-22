@@ -1,5 +1,5 @@
 # playing with audio
 
-1. npm start
+[线上演示](https://newraina.github.io/playing-with-audio/publish/silde.htm)
 
-2. 访问 [localhost:4000](localhost:4000)
+打开会请求麦克风权限
